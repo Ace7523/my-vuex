@@ -21,7 +21,11 @@ export default new Vuex.Store(
             } 
         },
         actions : {
-    
+            asyncIncrement (store, n) {
+                setTimeout(()=>{
+                    store.commit('increment', n)
+                }, 3000)
+            }
         }
     }
 )
