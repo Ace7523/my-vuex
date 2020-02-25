@@ -2,10 +2,20 @@ let Vue
 
 class Store{
     constructor(options) {
-        this._s = options.state
+        // vuex 最核心的几句代码 保证更改vuex中state状态后 
+        // 整个vue中用到的地方全都刷新
+        // 所以 vuex强依赖vue环境
+        this.vm = new Vue({
+            data: ()=>{
+                return {
+                    state: options.state
+                }
+            }
+        })
     }
+    // 为什么要this.vm = new Vue 这么写 为了使state是响应式的对象
     get state() {
-        return this._s
+        return this.vm.state
     }
 }
 
