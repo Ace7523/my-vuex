@@ -37,10 +37,31 @@ class Store{
             })
         })
 
+        let mutations = options.mutations
+        this.mutations = {}
+        forEach(mutations, (key, value) => {
+            // this.mutations[key] = value()
+            // 这么写不容易传参, 所以还是要劫持一下
+            this.mutations[key] = (payload) => {
+                value(this.state, payload)
+            }
+
+        })
     }
     // 为什么要this.vm = new Vue 这么写 为了使state是响应式的对象
     get state() {
         return this.vm.state
+    }
+    // 下面的commit写法
+    // 等价于 在 constructor中这么写
+    // let commit = options.commit
+    // this.commit = () => {
+    //     commit()
+    // }
+    // 因为会这样调用this.$store.commit， 所以commit是vue实例上的方法，
+    // 这么写保证this永远指向实例
+    commit = (mutationName, payload)=>{
+        this.mutations[mutationName](payload)
     }
 }
 
@@ -65,3 +86,22 @@ export default {
     install,
     Store
 }
+
+// 第四次提交
+// mutation 其实就是函数劫持，使用的时候  this.$store.commit('funName', param)
+// 逆推的话，就是 Store的每个实例，都有一个commit方法，接收两个参数
+// 但是在写store的时候 却是内部又给传了一个参数
+// mutations : {
+//     increment (state, n) {
+//       state.age += n
+//     } 
+// }
+// 所以在源码的层面，通过函数劫持，把这个state参数给加了进去
+// 就是类似下面的代码， 日常业务也会挺有用的
+// this.mutations = {}
+// Object.keys(mutations).forEach(mutationName => {
+//     this.mutations[mutationName] = (payload) =>{
+//         mutations[mutationName](this.state, payload)
+//     }
+// })
+

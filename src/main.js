@@ -35,4 +35,5 @@ new Vue({
 
 //   }
 // }
-// 然后用自己封装的forEach 遍历 getters 对象
+// 然后用自己封装的forEach 遍历 getters 对象 ， 用户传来的getters对象中的方法，通过defineProperty
+// 方式，定义在stoer对象的getters属性上

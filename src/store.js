@@ -16,7 +16,9 @@ export default new Vuex.Store(
             }
         },
         mutations : {
-    
+            increment (state, n) {
+              state.age += n
+            } 
         },
         actions : {
     
