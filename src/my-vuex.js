@@ -1,5 +1,11 @@
 let Vue
 
+let forEach = (obj, cb) => {
+    Object.keys(obj).forEach(key => {
+        cb(key, obj[key])
+    })
+}
+
 class Store{
     constructor(options) {
         // vuex 最核心的几句代码 保证更改vuex中state状态后 
@@ -12,6 +18,25 @@ class Store{
                 }
             }
         })
+
+        // 遍历用户传来的getters 
+        let getters = options.getters
+        this.getters = {}
+        // Object.keys(getters).forEach(funName => {
+        //     Object.defineProperty(this.getters, funName, {
+        //         get: ()=>{
+        //             return getters[funName](this.state)
+        //         }
+        //     })
+        // })
+        forEach(getters, (key, value)=>{
+            Object.defineProperty(this.getters, key, {
+                get: ()=>{
+                    return value(this.state)
+                }
+            })
+        })
+
     }
     // 为什么要this.vm = new Vue 这么写 为了使state是响应式的对象
     get state() {

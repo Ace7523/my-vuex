@@ -22,3 +22,17 @@ new Vue({
 
 // 利用上述渲染规则特性  在根组件上挂载$store ， 子组件寻找父组件的$store 实现全局单例
 
+
+// 第三次提交
+// 处理用户传的getters es6写法 
+// fun = function() {}
+// obj= {
+//   fun
+// }
+// 等同于
+// obj={
+//   fun: function(){
+
+//   }
+// }
+// 然后用自己封装的forEach 遍历 getters 对象
