@@ -7,6 +7,26 @@ Vue.use(Vuex)
 
 export default new Vuex.Store(
     {
+        modules: {
+            a: {
+                state: {
+                    age: 100
+                }
+            },
+            b: {
+                state: {
+                    age: 200
+                },
+                modules: {
+                    c: {
+                        state: {
+                            age: 300
+                        }
+
+                    }
+                }
+            }
+        },
         state : {
             age : 19
         },
@@ -24,7 +44,7 @@ export default new Vuex.Store(
             asyncIncrement (store, n) {
                 setTimeout(()=>{
                     store.commit('increment', n)
-                }, 3000)
+                }, 1000)
             }
         }
     }

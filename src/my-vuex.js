@@ -5,6 +5,32 @@ let forEach = (obj, cb) => {
         cb(key, obj[key])
     })
 }
+class moduleCollection{
+    constructor(options) {
+        this.register([], options)
+    }
+    register(path, rootModule){
+        let rawModule = {
+            _raw: rootModule,
+            _children: {},
+            state: rootModule.state
+        }
+        if(!this.root){
+            this.root = rawModule
+        } else {
+            let parentModule = path.slice(0, -1).reduce((root, current) => {
+                return root._children[current]
+            }, this.root)
+            parentModule._children[path[path.length - 1]] = rawModule
+        }
+
+        if(rootModule.modules){
+            forEach(rootModule.modules, (key, value) => {
+                this.register(path.concat(key), value)
+            })
+        }
+    }
+}
 
 class Store{
     constructor(options) {
@@ -18,46 +44,53 @@ class Store{
                 }
             }
         })
-
-        // 遍历用户传来的getters 
-        let getters = options.getters
         this.getters = {}
-        // Object.keys(getters).forEach(funName => {
-        //     Object.defineProperty(this.getters, funName, {
+        this.mutations = {}
+        this.actions = {}
+
+        this.modules = new moduleCollection(options)
+        console.log(this.modules)
+
+        // ****************************************
+        // // 遍历用户传来的getters 
+        // let getters = options.getters
+        // this.getters = {}
+        // // Object.keys(getters).forEach(funName => {
+        // //     Object.defineProperty(this.getters, funName, {
+        // //         get: ()=>{
+        // //             return getters[funName](this.state)
+        // //         }
+        // //     })
+        // // })
+        // forEach(getters, (key, value)=>{
+        //     Object.defineProperty(this.getters, key, {
         //         get: ()=>{
-        //             return getters[funName](this.state)
+        //             return value(this.state)
         //         }
         //     })
         // })
-        forEach(getters, (key, value)=>{
-            Object.defineProperty(this.getters, key, {
-                get: ()=>{
-                    return value(this.state)
-                }
-            })
-        })
 
-        let mutations = options.mutations
-        this.mutations = {}
-        forEach(mutations, (key, value) => {
-            // this.mutations[key] = value()
-            // 这么写不容易传参, 所以还是要劫持一下
-            this.mutations[key] = (payload) => {
-                value(this.state, payload)
-            }
+        // let mutations = options.mutations
+        // this.mutations = {}
+        // forEach(mutations, (key, value) => {
+        //     // this.mutations[key] = value()
+        //     // 这么写不容易传参, 所以还是要劫持一下
+        //     this.mutations[key] = (payload) => {
+        //         value(this.state, payload)
+        //     }
 
-        })
+        // })
 
-        let actions = options.actions
-        this.actions = {}
-        forEach(actions, (key, value) => {
-            // this.mutations[key] = value()
-            // 这么写不容易传参, 所以还是要劫持一下
-            this.actions[key] = (payload) => {
-                value(this, payload)
-            }
+        // let actions = options.actions
+        // this.actions = {}
+        // forEach(actions, (key, value) => {
+        //     // this.mutations[key] = value()
+        //     // 这么写不容易传参, 所以还是要劫持一下
+        //     this.actions[key] = (payload) => {
+        //         value(this, payload)
+        //     }
 
-        })
+        // })
     }
     // 为什么要this.vm = new Vue 这么写 为了使state是响应式的对象
     get state() {
