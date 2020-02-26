@@ -31,7 +31,51 @@ class moduleCollection{
         }
     }
 }
+function installModule(store, rootState, path, rawModule){
 
+    if(path.length > 0){
+        let parentState = path.slice(0, -1).reduce((root, current)=>{
+            return rootState[current]
+        }, rootState)
+        Vue.set(parentState, path[path.length - 1], rawModule.state)
+    }
+
+    let getters = rawModule._raw.getters
+    if (getters) {
+        forEach(getters, (key, value) => {
+            Object.defineProperty(store.getters, key, {
+                get: () => {
+                    return value(rawModule.state)
+                }
+            })
+        })
+    }
+    let mutations = rawModule._raw.mutations
+    if (mutations) {
+        forEach(mutations, (key, value) => {
+            // 如果有的话，就直接用 ，没有的话，就是把这个赋值为数组
+            let arr = store.mutations[key] || (store.mutations[key] = [])
+            arr.push(payload => {
+                value(rawModule.state, payload)
+            })
+        })
+    }
+
+    let actions = rawModule._raw.actions
+    if (actions) {
+        forEach(actions, (key, value) => {
+            // 如果有的话，就直接用 ，没有的话，就是把这个赋值为数组
+            let arr = store.actions[key] || (store.actions[key] = [])
+            arr.push(payload => {
+                value(store, payload)
+            })
+        })
+    }
+
+    forEach(rawModule._children, (key, value)=>{
+        installModule(store, rootState, path.concat(key), value)
+    })
+}
 class Store{
     constructor(options) {
         // vuex 最核心的几句代码 保证更改vuex中state状态后 
@@ -50,6 +94,8 @@ class Store{
 
         this.modules = new moduleCollection(options)
         console.log(this.modules)
+        installModule(this, this.state, [], this.modules.root)
+        console.log(this)
 
         // ****************************************
         // // 遍历用户传来的getters 
@@ -105,10 +151,10 @@ class Store{
     // 因为会这样调用this.$store.commit， 所以commit是vue实例上的方法，
     // 这么写保证this永远指向实例
     commit = (mutationName, payload)=>{
-        this.mutations[mutationName](payload)
+        this.mutations[mutationName].forEach(fn => fn(payload))
     }
     dispatch = (actionName, payload) => {
-        this.actions[actionName](payload)
+        this.actions[actionName].forEach(fn => fn(payload))
     }
 }
 

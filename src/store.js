@@ -11,17 +11,32 @@ export default new Vuex.Store(
             a: {
                 state: {
                     age: 100
-                }
+                },
+                mutations : {
+                    increment (state, n) {
+                      console.log('modules-a-increment')
+                    } 
+                },
             },
             b: {
                 state: {
                     age: 200
                 },
+                mutations : {
+                    increment (state, n) {
+                      console.log('modules-b-increment')
+                    } 
+                },
                 modules: {
                     c: {
                         state: {
                             age: 300
-                        }
+                        },
+                        mutations : {
+                            increment (state, n) {
+                              console.log('modules-c-increment')
+                            } 
+                        },
 
                     }
                 }

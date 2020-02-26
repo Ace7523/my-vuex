@@ -2,7 +2,7 @@
   <div id="app">
    rootage: {{this.$store.state.age}}
    rootgetters: {{this.$store.getters.addAge}}
-   <!-- <div>
+   <div>
      a age : {{this.$store.state.a.age}}
    </div>
    <div>
@@ -10,7 +10,7 @@
    </div>
    <div>
      c age : {{this.$store.state.b.c.age}}
-   </div> -->
+   </div>
    <button @click="change()">按钮</button>
    <button @click="asyncChange()">按钮 测试异步</button>
   </div>
